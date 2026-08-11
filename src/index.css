@@ -1,0 +1,32 @@
+:root {
+  --bg: #f5f5f5;
+  --surface: #ffffff;
+  --ink: #111111;
+  --muted: #6b6b6b;
+  --line: #dddddd;
+  --accent: #111111;
+  --brand: #111111;
+  --danger: #c23b3b;
+  --font-display: "Gowun Batang", serif;
+  --font-body: "IBM Plex Sans KR", sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-body);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
