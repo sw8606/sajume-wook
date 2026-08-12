@@ -42,6 +42,9 @@ function buildFormPayload(name, birthDate, birthTime, gender, calendarType, resu
 }
 
 function App() {
+  const [session, setSession] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
+
   const [name, setName] = useState('')
   const [birthDate, setBirthDate] = useState('')
   const [birthTime, setBirthTime] = useState('')
@@ -64,7 +67,73 @@ function App() {
 
   const isViewing = Boolean(selectedId)
   const isBusy = loading || actionLoading
+  const userId = session?.user?.id
 
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session: nextSession } }) => {
+      setSession(nextSession)
+      setAuthLoading(false)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession)
+      setAuthLoading(false)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (!userId) {
+      setReadings([])
+      setListLoading(false)
+      return
+    }
+
+    setListLoading(true)
+    loadReadings()
+  }, [userId])
+
+  async function handleGoogleSignIn() {
+    setError('')
+    setActionLoading(true)
+
+    const { error: signInError } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin,
+      },
+    })
+
+    if (signInError) {
+      setError(signInError.message || 'Google 로그인에 실패했습니다.')
+      setActionLoading(false)
+    }
+  }
+
+  async function handleSignOut() {
+    setActionLoading(true)
+    setError('')
+    try {
+      const { error: signOutError } = await supabase.auth.signOut()
+      if (signOutError) {
+        throw signOutError
+      }
+      setSelectedId(null)
+      setIsEditing(false)
+      setName('')
+      setBirthDate('')
+      setBirthTime('')
+      setGender('')
+      setCalendarType('solar')
+      setResult('')
+      setReadings([])
+    } catch (err) {
+      setError(err.message || '로그아웃 중 오류가 발생했습니다.')
+    } finally {
+      setActionLoading(false)
+    }
+  }
   async function loadReadings() {
     const { data, error: fetchError } = await supabase
       .from('saju_readings')
@@ -83,10 +152,6 @@ function App() {
     return next
   }
 
-  useEffect(() => {
-    loadReadings()
-  }, [])
-
   function applyReadingToForm(reading) {
     setName(reading.name)
     setBirthDate(reading.birth_date ?? '')
@@ -97,16 +162,23 @@ function App() {
   }
 
   async function createReading(form, resultText) {
+    if (!userId) {
+      throw new Error('로그인이 필요합니다.')
+    }
+
     const { data, error: saveError } = await supabase
       .from('saju_readings')
-      .insert(buildFormPayload(
-        form.name,
-        form.birthDate,
-        form.birthTime,
-        form.gender,
-        form.calendarType,
-        resultText,
-      ))
+      .insert({
+        ...buildFormPayload(
+          form.name,
+          form.birthDate,
+          form.birthTime,
+          form.gender,
+          form.calendarType,
+          resultText,
+        ),
+        user_id: userId,
+      })
       .select('id, name, birth_date, birth_time, gender, calendar_type, result, created_at')
       .single()
 
@@ -449,8 +521,44 @@ function App() {
 
   return (
     <div className="page">
+      {authLoading ? (
+        <main className="auth-shell">
+          <p className="auth-shell__message">로그인 상태를 확인하는 중...</p>
+        </main>
+      ) : !session ? (
+        <main className="auth-shell">
+          <div className="login">
+            <p className="brand">사주미</p>
+            <h1>나를 담은 사주 보기</h1>
+            <p className="login__lead">
+              Google 계정으로 로그인하면 사주 기록을 저장하고 언제든 다시 볼 수 있습니다.
+            </p>
+            <button
+              type="button"
+              className="login__google"
+              onClick={handleGoogleSignIn}
+              disabled={actionLoading}
+            >
+              {actionLoading ? 'Google로 이동 중...' : 'Google로 시작하기'}
+            </button>
+            {error && <p className="error">{error}</p>}
+          </div>
+        </main>
+      ) : (
+        <>
       <aside className="sidebar" aria-label="저장된 사주 목록">
         <p className="sidebar__brand">사주미</p>
+        <div className="sidebar__user">
+          <p className="sidebar__user-email">{session.user.email}</p>
+          <button
+            type="button"
+            className="sidebar__logout"
+            onClick={handleSignOut}
+            disabled={isBusy}
+          >
+            로그아웃
+          </button>
+        </div>
         <button
           type="button"
           className={`sidebar__new${!isViewing ? ' sidebar__new--active' : ''}`}
@@ -571,6 +679,8 @@ function App() {
 
         {!isViewing && resultSection}
       </main>
+        </>
+      )}
     </div>
   )
 }

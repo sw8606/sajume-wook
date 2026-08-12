@@ -40,6 +40,16 @@ VITE_GEMINI_API_KEY=발급받은_API_키
 
 API 키는 [Google AI Studio](https://aistudio.google.com/apikey)에서 발급받을 수 있습니다.
 
+### Google 로그인 (Supabase Auth)
+
+1. Supabase Dashboard → **Authentication → Sign In / Providers**에서 Google을 활성화합니다.
+2. Google Cloud Console OAuth 클라이언트의 **Authorized redirect URI**에 아래를 등록합니다.
+   - `https://<프로젝트-ref>.supabase.co/auth/v1/callback`
+3. Supabase Dashboard → **Authentication → URL Configuration**에서 다음을 설정합니다.
+   - **Site URL**: `http://localhost:5173` (로컬 개발)
+   - **Redirect URLs**: `http://localhost:5173`, `http://localhost:5173/**`
+4. 배포 도메인이 있으면 Site URL·Redirect URLs에 배포 URL도 추가합니다.
+
 > `.env`는 Git에 포함되지 않습니다. 키를 절대 커밋하지 마세요.
 
 ### 3. 개발 서버 실행
