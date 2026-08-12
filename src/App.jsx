@@ -60,6 +60,9 @@ function App() {
   const [readings, setReadings] = useState([])
   const [selectedId, setSelectedId] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(
+    () => window.matchMedia('(min-width: 721px)').matches,
+  )
 
   const resultRef = useRef(null)
   const formRef = useRef(null)
@@ -520,7 +523,9 @@ function App() {
   )
 
   return (
-    <div className="page">
+    <div
+      className={`page${authLoading || !session ? ' page--auth' : ''}${session && sidebarOpen ? ' page--sidebar-open' : ''}`}
+    >
       {authLoading ? (
         <main className="auth-shell">
           <p className="auth-shell__message">로그인 상태를 확인하는 중...</p>
@@ -546,8 +551,40 @@ function App() {
         </main>
       ) : (
         <>
-      <aside className="sidebar" aria-label="저장된 사주 목록">
-        <p className="sidebar__brand">사주미</p>
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="sidebar-backdrop"
+          onClick={() => setSidebarOpen(false)}
+          aria-label="사이드바 닫기"
+        />
+      )}
+      {!sidebarOpen && (
+        <button
+          type="button"
+          className="sidebar-fab"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="기록 열기"
+        >
+          기록
+        </button>
+      )}
+      <aside
+        className={`sidebar${sidebarOpen ? ' sidebar--open' : ''}`}
+        aria-label="저장된 사주 목록"
+        aria-hidden={!sidebarOpen}
+      >
+        <div className="sidebar__header">
+          <p className="sidebar__brand">사주미</p>
+          <button
+            type="button"
+            className="sidebar__toggle"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="사이드바 닫기"
+          >
+            닫기
+          </button>
+        </div>
         <div className="sidebar__user">
           <p className="sidebar__user-email">{session.user.email}</p>
           <button
