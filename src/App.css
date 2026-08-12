@@ -95,6 +95,42 @@
   gap: 4px;
 }
 
+.sidebar__row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sidebar__row .sidebar__item {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar__delete {
+  flex-shrink: 0;
+  padding: 6px 8px;
+  color: var(--danger);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.sidebar__delete:hover:not(:disabled) {
+  opacity: 1;
+  background: rgba(194, 59, 59, 0.08);
+}
+
+.sidebar__delete:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
 .sidebar__item {
   display: flex;
   flex-direction: column;
@@ -195,6 +231,30 @@
   text-align: center;
 }
 
+.panel--edit {
+  padding: 28px 24px 32px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 10px 28px rgba(17, 17, 17, 0.04);
+}
+
+.panel__eyebrow {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.panel__title {
+  margin: 0 0 24px;
+  color: var(--brand);
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
 .field {
   margin-bottom: 18px;
   text-align: center;
@@ -248,9 +308,39 @@
 }
 
 .field input:disabled,
-.field select:disabled {
+.field select:disabled,
+.field__textarea:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.field--textarea {
+  text-align: left;
+}
+
+.field__textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 14px;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  resize: vertical;
+  transition: border-color 0.15s ease;
+}
+
+.field__textarea:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.field__textarea:focus {
+  outline: none;
+  border-color: var(--brand);
 }
 
 .submit {
@@ -276,6 +366,31 @@
 .submit:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.submit--secondary {
+  margin-top: 10px;
+  color: var(--ink);
+  background: #f3f3f3;
+}
+
+.submit--secondary:hover:not(:disabled) {
+  opacity: 1;
+  background: #e8e8e8;
+}
+
+.submit--ghost {
+  margin-top: 10px;
+  color: var(--muted);
+  background: transparent;
+  border: 1px dashed var(--line);
+}
+
+.submit--ghost:hover:not(:disabled) {
+  opacity: 1;
+  color: var(--ink);
+  border-color: var(--ink);
+  background: transparent;
 }
 
 .error {
@@ -443,6 +558,54 @@
   background: #f7f7f7;
 }
 
+.result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.result__action {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 12px 14px;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f7f7f7;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.result__action:hover:not(:disabled) {
+  border-color: var(--ink);
+  background: #efefef;
+}
+
+.result__action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.result__action--danger {
+  color: var(--danger);
+  background: rgba(194, 59, 59, 0.06);
+  border-color: rgba(194, 59, 59, 0.25);
+}
+
+.result__action--danger:hover:not(:disabled) {
+  border-color: var(--danger);
+  background: rgba(194, 59, 59, 0.1);
+}
+
+.result__action--ghost {
+  color: var(--muted);
+  background: transparent;
+}
+
 /* 첫 글자 오기 전 스켈레톤 */
 .skeleton {
   display: grid;
@@ -544,8 +707,12 @@
     gap: 6px;
   }
 
-  .sidebar__item {
-    width: auto;
+  .sidebar__row {
+    flex-wrap: wrap;
+  }
+
+  .sidebar__delete {
+    padding: 4px 6px;
   }
 }
 
