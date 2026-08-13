@@ -1,10 +1,20 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
+import AnalyticsRouteTracker from './components/common/AnalyticsRouteTracker.jsx'
+import SharedResultPage from './pages/SharedResultPage.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <AnalyticsRouteTracker />
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/result/:shareToken" element={<SharedResultPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   </StrictMode>,
 )

@@ -1,8 +1,34 @@
 .page {
   --sidebar-width: 220px;
+  position: relative;
   min-height: 100vh;
   padding: 56px 24px 80px 24px;
   transition: padding-left 0.25s ease;
+}
+
+.page-login {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  z-index: 30;
+  padding: 6px 2px;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.page-login:hover:not(:disabled) {
+  color: var(--ink);
+}
+
+.page-login:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .page--sidebar-open {
@@ -38,6 +64,73 @@
   border-radius: 16px;
   background: var(--surface);
   box-shadow: 0 10px 28px rgba(17, 17, 17, 0.04);
+}
+
+.char-stage {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 12px;
+}
+
+.char-stage--cta {
+  margin: 8px 0 4px;
+}
+
+.char-stage--analyzing {
+  margin-bottom: 16px;
+}
+
+.char-img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+
+.char-img--xs {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.char-img--sm {
+  width: 88px;
+  margin: 0 auto 12px;
+}
+
+.char-img--md {
+  width: 120px;
+  margin: 0 auto 14px;
+}
+
+.char-img--lg {
+  width: 168px;
+}
+
+.char-img--hero {
+  width: min(220px, 70%);
+  margin: 0 auto 16px;
+}
+
+.char-img--cta {
+  width: min(200px, 72%);
+}
+
+.char-img--float {
+  animation: char-float 2.2s ease-in-out infinite;
+}
+
+@keyframes char-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 .login .brand {
@@ -272,6 +365,13 @@
   cursor: pointer;
 }
 
+.sidebar__brand-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
 .sidebar__brand {
   margin: 0;
   color: var(--ink);
@@ -340,6 +440,18 @@
   color: var(--muted);
   font-size: 0.85rem;
   line-height: 1.5;
+}
+
+.sidebar__empty-block {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  text-align: center;
+}
+
+.sidebar__empty-block .char-img--sm {
+  width: 64px;
+  margin: 0;
 }
 
 .sidebar__list {
@@ -477,6 +589,22 @@
   font-size: 0.92rem;
   font-weight: 400;
   line-height: 1.6;
+}
+
+.hero__stat {
+  margin: 14px auto 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+
+.hero__stat span {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .panel {
@@ -714,6 +842,36 @@
   background: transparent;
 }
 
+.guest-auth {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.guest-auth__link {
+  padding: 0;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.guest-auth__link:hover:not(:disabled) {
+  opacity: 0.75;
+}
+
+.guest-auth__link:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .error {
   margin: 18px 0 0;
   color: var(--danger);
@@ -859,6 +1017,56 @@
   border-top: 1px solid var(--line);
 }
 
+.result__preview {
+  position: relative;
+}
+
+.result__preview--locked .markdown {
+  max-height: min(48vh, 420px);
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, #000 42%, transparent 96%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 42%, transparent 96%);
+  pointer-events: none;
+  user-select: none;
+}
+
+.result__gate {
+  position: relative;
+  z-index: 1;
+  margin-top: -72px;
+  padding-top: 24px;
+}
+
+.result__gate-card {
+  padding: 22px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 12px 28px rgba(17, 17, 17, 0.06);
+  backdrop-filter: blur(8px);
+  text-align: center;
+}
+
+.result__gate-title {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.result__gate-lead {
+  margin: 0 auto 18px;
+  max-width: 32ch;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.result__gate .login__google {
+  margin-bottom: 0;
+}
+
 .result__new {
   width: 100%;
   margin-top: 28px;
@@ -925,6 +1133,34 @@
 .result__action--ghost {
   color: var(--muted);
   background: transparent;
+}
+
+a.result__action,
+a.submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.page--shared {
+  padding: 40px 20px 64px;
+}
+
+.shared-top {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.shared-top__brand {
+  margin-bottom: 8px;
+}
+
+.shared-top__note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
 }
 
 /* 첫 글자 오기 전 스켈레톤 */

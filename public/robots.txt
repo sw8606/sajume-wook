@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sajume-wook.vercel.app/sitemap.xml
