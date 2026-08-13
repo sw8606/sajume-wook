@@ -120,7 +120,7 @@ export default function App() {
                 profileForm={app.profileForm}
                 actionLoading={app.actionLoading}
                 isBusy={app.isBusy}
-                onGoogleSignIn={app.handleGoogleSignIn}
+                onGoogleSignIn={() => app.handleGoogleSignIn('result_gate')}
                 onShare={() => app.handleShareReading()}
                 onStartEdit={app.handleStartEdit}
                 onDelete={() => app.handleDeleteReading()}
@@ -150,7 +150,7 @@ export default function App() {
                 onSubmit={app.handleSubmit}
                 loading={app.loading}
                 actionLoading={app.actionLoading}
-                onOpenLogin={() => app.setShowLoginModal(true)}
+                onOpenLogin={() => app.openLoginModal('guest_form')}
               />
             )}
 
@@ -180,7 +180,7 @@ export default function App() {
                 profileForm={app.profileForm}
                 actionLoading={app.actionLoading}
                 isBusy={app.isBusy}
-                onGoogleSignIn={app.handleGoogleSignIn}
+                onGoogleSignIn={() => app.handleGoogleSignIn('result_gate')}
                 onShare={() => app.handleShareReading()}
                 onStartEdit={app.handleStartEdit}
                 onDelete={() => app.handleDeleteReading()}

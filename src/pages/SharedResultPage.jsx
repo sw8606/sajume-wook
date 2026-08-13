@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
+import { trackEvent } from '../lib/analytics.js'
 import { supabase } from '../lib/supabase.js'
 import { normalizeResult, profileMeta } from '../utils/format.js'
 import { shareLink } from '../utils/share.js'
@@ -38,6 +39,7 @@ export default function SharedResultPage() {
         setError('결과를 불러오지 못했습니다.')
         setReading(null)
         setLoading(false)
+        trackEvent('shared_result_error')
         return
       }
 
@@ -45,8 +47,10 @@ export default function SharedResultPage() {
       if (!row) {
         setError('공유된 사주 결과를 찾을 수 없습니다.')
         setReading(null)
+        trackEvent('shared_result_not_found')
       } else {
         setReading(row)
+        trackEvent('shared_result_view')
       }
       setLoading(false)
     }
@@ -61,15 +65,19 @@ export default function SharedResultPage() {
     const url = window.location.href
     const title = reading?.name ? `${reading.name}님의 사주` : '사주미 결과'
 
+    trackEvent('share_click', { location: 'shared_page' })
     await shareLink({
       title,
       text: '사주미에서 본 사주 결과예요.',
       url,
+      onShared: () => trackEvent('share_success', { method: 'native' }),
       onCopied: () => {
+        trackEvent('share_success', { method: 'copy' })
         setToast({ message: '링크를 복사했어요.' })
         setTimeout(() => setToast(null), 2200)
       },
       onError: () => {
+        trackEvent('share_error')
         setToast({ message: '공유에 실패했어요. 주소창 링크를 복사해 주세요.' })
         setTimeout(() => setToast(null), 2500)
       },
@@ -91,7 +99,11 @@ export default function SharedResultPage() {
         {!loading && error && (
           <section className="result result--card">
             <p className="error">{error}</p>
-            <Link className="submit" to="/">
+            <Link
+              className="submit"
+              to="/"
+              onClick={() => trackEvent('shared_cta_home', { context: 'error' })}
+            >
               사주미 시작하기
             </Link>
           </section>
@@ -109,7 +121,11 @@ export default function SharedResultPage() {
               <button type="button" className="result__action" onClick={handleShare}>
                 다시 공유하기
               </button>
-              <Link className="result__action result__action--ghost" to="/">
+              <Link
+                className="result__action result__action--ghost"
+                to="/"
+                onClick={() => trackEvent('shared_cta_home', { context: 'result' })}
+              >
                 나도 사주 보기
               </Link>
             </div>

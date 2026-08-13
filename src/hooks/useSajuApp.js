@@ -332,6 +332,7 @@ export function useSajuApp() {
       title,
       text: '사주미에서 본 사주 결과예요.',
       url,
+      onShared: () => trackEvent('share_success', { method: 'native' }),
       onCopied: () => {
         trackEvent('share_success', { method: 'copy' })
         showToast('공유 링크를 복사했어요.')
