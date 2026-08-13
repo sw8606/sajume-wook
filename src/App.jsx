@@ -90,6 +90,8 @@ function App() {
   const [listLoading, setListLoading] = useState(true)
   const [error, setError] = useState('')
   const [profileError, setProfileError] = useState('')
+  const [toast, setToast] = useState('')
+  const toastTimerRef = useRef(null)
 
   const [readings, setReadings] = useState([])
   const [selectedId, setSelectedId] = useState(null)
@@ -105,6 +107,22 @@ function App() {
   const isBusy = loading || actionLoading
   const userId = session?.user?.id
   const needsProfile = Boolean(session) && !profileLoading && !profile
+  const isNewReadingScreen = Boolean(session && profile && !selectedId && !showProfileEdit)
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
+    }
+  }, [])
+
+  function showToast(message) {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
+    setToast(message)
+    toastTimerRef.current = setTimeout(() => {
+      setToast('')
+      toastTimerRef.current = null
+    }, 2200)
+  }
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: nextSession } }) => {
@@ -333,11 +351,21 @@ function App() {
 
   function handleNewReading() {
     if (isBusy || !profile) return
+
+    if (isNewReadingScreen) {
+      showToast('이미 새 사주 만들기 화면이에요.')
+      requestAnimationFrame(() => {
+        formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      })
+      return
+    }
+
     setSelectedId(null)
     setIsEditing(false)
     setShowProfileEdit(false)
     setResult('')
     setError('')
+    showToast('새 사주 만들기로 이동했어요.')
     requestAnimationFrame(() => {
       formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     })
@@ -601,6 +629,11 @@ function App() {
     <div
       className={`page${authLoading || !session ? ' page--auth' : ''}${session && sidebarOpen ? ' page--sidebar-open' : ''}`}
     >
+      {toast && (
+        <div className="toast" role="status" aria-live="polite">
+          {toast}
+        </div>
+      )}
       {authLoading ? (
         <main className="auth-shell">
           <p className="auth-shell__message">로그인 상태를 확인하는 중...</p>
