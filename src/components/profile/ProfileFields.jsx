@@ -31,13 +31,25 @@ export default function ProfileFields({ form, onChange, disabled }) {
           <label htmlFor="profile-birthTime">
             태어난 시간 <span className="field__optional">선택</span>
           </label>
-          <input
-            id="profile-birthTime"
-            type="time"
-            value={form.birthTime}
-            onChange={(e) => onChange('birthTime', e.target.value)}
-            disabled={disabled}
-          />
+          <div className="field__time">
+            <input
+              id="profile-birthTime"
+              type="time"
+              value={form.birthTime}
+              onChange={(e) => onChange('birthTime', e.target.value)}
+              disabled={disabled}
+            />
+            {form.birthTime ? (
+              <button
+                type="button"
+                className="field__clear-time"
+                onClick={() => onChange('birthTime', '')}
+                disabled={disabled}
+              >
+                시간 지우기
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
 
