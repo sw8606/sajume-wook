@@ -90,8 +90,9 @@ function App() {
   const [listLoading, setListLoading] = useState(true)
   const [error, setError] = useState('')
   const [profileError, setProfileError] = useState('')
-  const [toast, setToast] = useState('')
+  const [toast, setToast] = useState(null)
   const toastTimerRef = useRef(null)
+  const toastHideRef = useRef(null)
 
   const [readings, setReadings] = useState([])
   const [selectedId, setSelectedId] = useState(null)
@@ -112,14 +113,22 @@ function App() {
   useEffect(() => {
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
+      if (toastHideRef.current) clearTimeout(toastHideRef.current)
     }
   }, [])
 
   function showToast(message) {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
-    setToast(message)
+    if (toastHideRef.current) clearTimeout(toastHideRef.current)
+
+    setToast({ message, leaving: false })
+
     toastTimerRef.current = setTimeout(() => {
-      setToast('')
+      setToast((prev) => (prev ? { ...prev, leaving: true } : null))
+      toastHideRef.current = setTimeout(() => {
+        setToast(null)
+        toastHideRef.current = null
+      }, 280)
       toastTimerRef.current = null
     }, 2200)
   }
@@ -630,8 +639,12 @@ function App() {
       className={`page${authLoading || !session ? ' page--auth' : ''}${session && sidebarOpen ? ' page--sidebar-open' : ''}`}
     >
       {toast && (
-        <div className="toast" role="status" aria-live="polite">
-          {toast}
+        <div
+          className={`toast${toast.leaving ? ' toast--out' : ''}`}
+          role="status"
+          aria-live="polite"
+        >
+          {toast.message}
         </div>
       )}
       {authLoading ? (
