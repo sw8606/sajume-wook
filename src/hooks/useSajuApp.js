@@ -326,11 +326,11 @@ export function useSajuApp() {
 
     trackEvent('share_click', { location: 'result' })
     const url = getShareUrl(reading.share_token)
-    const title = profile?.name ? `${profile.name}님의 사주` : '사주미 결과'
+    const title = profile?.name ? `${profile.name}님의 사주` : '명운당 결과'
 
     await shareLink({
       title,
-      text: '사주미에서 본 사주 결과예요.',
+      text: '명운당에서 본 사주 결과예요.',
       url,
       onShared: () => trackEvent('share_success', { method: 'native' }),
       onCopied: () => {

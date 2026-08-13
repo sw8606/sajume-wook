@@ -1,6 +1,6 @@
-# 사주미
+# 명운당
 
-[https://sajume-wook.vercel.app](https://sajume-wook.vercel.app) · 나를 담은 사주 보기
+[https://sajume-wook.vercel.app](https://sajume-wook.vercel.app) · 오늘의 운을 풀어주는 곳
 
 이름·생년월일·시간·성별·양력/음력을 입력하면 Gemini AI가 사주 기본 차트를 추정하고 해석해 주는 웹 서비스입니다.  
 게스트는 미리보기로 바로 체험하고, Google 로그인 후 전체 해석 저장·기록 관리·공유가 가능합니다.

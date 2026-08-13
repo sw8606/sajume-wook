@@ -63,12 +63,12 @@ export default function SharedResultPage() {
 
   async function handleShare() {
     const url = window.location.href
-    const title = reading?.name ? `${reading.name}님의 사주` : '사주미 결과'
+    const title = reading?.name ? `${reading.name}님의 사주` : '명운당 결과'
 
     trackEvent('share_click', { location: 'shared_page' })
     await shareLink({
       title,
-      text: '사주미에서 본 사주 결과예요.',
+      text: '명운당에서 본 사주 결과예요.',
       url,
       onShared: () => trackEvent('share_success', { method: 'native' }),
       onCopied: () => {
@@ -90,7 +90,7 @@ export default function SharedResultPage() {
 
       <main className="app app--reading">
         <header className="shared-top">
-          <p className="brand shared-top__brand">사주미</p>
+          <p className="brand shared-top__brand">명운당</p>
           <p className="shared-top__note">공유된 사주 결과</p>
         </header>
 
@@ -104,7 +104,7 @@ export default function SharedResultPage() {
               to="/"
               onClick={() => trackEvent('shared_cta_home', { context: 'error' })}
             >
-              사주미 시작하기
+              명운당 시작하기
             </Link>
           </section>
         )}

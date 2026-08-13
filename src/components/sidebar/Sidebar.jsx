@@ -25,7 +25,7 @@ export default function Sidebar({
       aria-hidden={!open}
     >
       <div className="sidebar__header">
-        <p className="sidebar__brand">사주미</p>
+        <p className="sidebar__brand">명운당</p>
         <button type="button" className="sidebar__toggle" onClick={onClose} aria-label="사이드바 닫기">
           닫기
         </button>
