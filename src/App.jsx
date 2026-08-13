@@ -114,10 +114,8 @@ export default function App() {
                 result={app.result}
                 isViewing={app.isViewing}
                 isEditing={app.isEditing}
-                isGuest={app.isGuest}
                 isResultLocked={app.isResultLocked}
-                profile={app.profile}
-                profileForm={app.profileForm}
+                subject={app.activeSubject}
                 actionLoading={app.actionLoading}
                 isBusy={app.isBusy}
                 onGoogleSignIn={() => app.handleGoogleSignIn('result_gate')}
@@ -130,7 +128,7 @@ export default function App() {
 
             {app.isViewing && app.isEditing && (
               <EditReadingForm
-                profile={app.profile}
+                subject={app.activeSubject}
                 result={app.result}
                 onChangeResult={app.setResult}
                 onSubmit={app.handleSaveEdit}
@@ -158,6 +156,9 @@ export default function App() {
               <MemberSajuForm
                 formRef={app.formRef}
                 profile={app.profile}
+                subjectForm={app.subjectForm}
+                onChangeSubject={app.applySubjectFormChange}
+                onFillFromProfile={app.handleFillSubjectFromProfile}
                 onSubmit={app.handleSubmit}
                 onEditProfile={app.handleOpenProfileEdit}
                 loading={app.loading}
@@ -174,10 +175,8 @@ export default function App() {
                 result={app.result}
                 isViewing={app.isViewing}
                 isEditing={app.isEditing}
-                isGuest={app.isGuest}
                 isResultLocked={app.isResultLocked}
-                profile={app.profile}
-                profileForm={app.profileForm}
+                subject={app.activeSubject}
                 actionLoading={app.actionLoading}
                 isBusy={app.isBusy}
                 onGoogleSignIn={() => app.handleGoogleSignIn('result_gate')}

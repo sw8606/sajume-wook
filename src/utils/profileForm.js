@@ -28,12 +28,33 @@ export function validateProfileForm(form) {
   return ''
 }
 
-export function profileAsSajuForm(profile) {
+export function readingAsSajuForm(reading) {
   return {
-    name: profile.name,
-    birthDate: profile.birth_date,
-    birthTime: formatBirthTime(profile.birth_time),
-    gender: profile.gender,
-    calendarType: profile.calendar_type,
+    name: reading.name,
+    birthDate: reading.birth_date,
+    birthTime: formatBirthTime(reading.birth_time),
+    gender: reading.gender,
+    calendarType: reading.calendar_type,
+  }
+}
+
+export function formAsSajuForm(form) {
+  return {
+    name: form.name.trim(),
+    birthDate: form.birthDate,
+    birthTime: form.birthTime,
+    gender: form.gender,
+    calendarType: form.calendarType,
+  }
+}
+
+/** 사주 기록 insert용 대상자 스냅샷 */
+export function formToReadingSubject(form) {
+  return {
+    name: form.name.trim(),
+    birth_date: form.birthDate,
+    birth_time: form.birthTime || null,
+    gender: form.gender,
+    calendar_type: form.calendarType,
   }
 }

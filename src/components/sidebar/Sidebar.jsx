@@ -59,7 +59,7 @@ export default function Sidebar({
       </button>
 
       <h2 className="sidebar__title">
-        기록
+        사주 기록
         {!listLoading && readings.length > 0 && (
           <span className="sidebar__count">{readings.length}</span>
         )}
@@ -81,7 +81,7 @@ export default function Sidebar({
                 aria-current={selectedId === reading.id ? 'true' : undefined}
               >
                 <span className="sidebar__item-name">
-                  {profile?.name ? `${profile.name}님` : '사주 기록'}
+                  {reading.name ? `${reading.name}님` : '사주 기록'}
                 </span>
                 <span className="sidebar__item-meta">{formatReadingDate(reading.created_at)}</span>
               </button>

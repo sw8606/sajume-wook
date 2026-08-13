@@ -1,6 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 import { CHAR } from '../../constants/chars.js'
-import { formMeta, profileMeta } from '../../utils/format.js'
+import { profileMeta } from '../../utils/format.js'
 
 export default function ResultSection({
   resultRef,
@@ -8,10 +8,8 @@ export default function ResultSection({
   result,
   isViewing,
   isEditing,
-  isGuest,
   isResultLocked,
-  profile,
-  profileForm,
+  subject,
   actionLoading,
   isBusy,
   onGoogleSignIn,
@@ -22,8 +20,8 @@ export default function ResultSection({
 }) {
   if (!loading && !result) return null
 
-  const displayName = profileForm?.name || profile?.name
-  const meta = isGuest ? formMeta(profileForm) : profileMeta(profile)
+  const displayName = subject?.name
+  const meta = profileMeta(subject)
 
   return (
     <section
@@ -33,8 +31,8 @@ export default function ResultSection({
       {isViewing ? (
         <>
           <p className="result__eyebrow">저장된 해석</p>
-          <h2>{profile?.name ? `${profile.name}님의 사주` : '사주 해석'}</h2>
-          <p className="result__meta">{profileMeta(profile)}</p>
+          <h2>{displayName ? `${displayName}님의 사주` : '사주 해석'}</h2>
+          {meta && <p className="result__meta">{meta}</p>}
         </>
       ) : (
         <>

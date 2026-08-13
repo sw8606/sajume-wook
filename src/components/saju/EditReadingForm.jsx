@@ -1,7 +1,7 @@
 import { profileMeta } from '../../utils/format.js'
 
 export default function EditReadingForm({
-  profile,
+  subject,
   result,
   onChangeResult,
   onSubmit,
@@ -14,8 +14,8 @@ export default function EditReadingForm({
   return (
     <form className="panel panel--edit" onSubmit={onSubmit}>
       <p className="panel__eyebrow">기록 수정</p>
-      <h2 className="panel__title">{profile?.name ? `${profile.name}님의 사주` : '사주 수정'}</h2>
-      <p className="result__meta result__meta--panel">{profileMeta(profile)}</p>
+      <h2 className="panel__title">{subject?.name ? `${subject.name}님의 사주` : '사주 수정'}</h2>
+      <p className="result__meta result__meta--panel">{profileMeta(subject)}</p>
 
       <div className="field field--textarea">
         <label htmlFor="result">사주 해석</label>
@@ -39,7 +39,7 @@ export default function EditReadingForm({
         onClick={onReinterpret}
         disabled={isBusy}
       >
-        {loading ? '풀이 중...' : '프로필로 다시 풀이'}
+        {loading ? '풀이 중...' : '이 정보로 다시 풀이'}
       </button>
       <button className="submit submit--ghost" type="button" onClick={onCancel} disabled={isBusy}>
         취소

@@ -10,12 +10,27 @@ import {
 } from '../utils/pendingReading.js'
 import {
   emptyProfileForm,
-  profileAsSajuForm,
+  formAsSajuForm,
+  formToReadingSubject,
   profileToForm,
+  readingAsSajuForm,
   validateProfileForm,
 } from '../utils/profileForm.js'
 import { getShareUrl, shareLink } from '../utils/share.js'
 import { useToast } from './useToast.js'
+
+const READING_COLUMNS =
+  'id, user_id, result, created_at, share_token, name, birth_date, birth_time, gender, calendar_type'
+
+function formToSubject(form) {
+  return {
+    name: form.name,
+    birth_date: form.birthDate,
+    birth_time: form.birthTime,
+    gender: form.gender,
+    calendar_type: form.calendarType,
+  }
+}
 
 export function useSajuApp() {
   const { toast, showToast } = useToast()
@@ -25,6 +40,7 @@ export function useSajuApp() {
   const [profile, setProfile] = useState(null)
   const [profileLoading, setProfileLoading] = useState(false)
   const [profileForm, setProfileForm] = useState(emptyProfileForm())
+  const [subjectForm, setSubjectForm] = useState(emptyProfileForm())
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [showProfileEdit, setShowProfileEdit] = useState(false)
   const [showLoginModal, setShowLoginModal] = useState(false)
@@ -57,6 +73,10 @@ export function useSajuApp() {
   const isNewReadingScreen = Boolean(
     ((session && profile) || isGuest) && !selectedId && !showProfileEdit,
   )
+  const selectedReading = readings.find((item) => item.id === selectedId) ?? null
+  const activeSubject = selectedReading
+    ? selectedReading
+    : formToSubject(isGuest ? profileForm : subjectForm)
 
   useEffect(() => {
     let cancelled = false
@@ -107,6 +127,7 @@ export function useSajuApp() {
       setListLoading(false)
       setShowProfileModal(false)
       setShowProfileEdit(false)
+      setSubjectForm(emptyProfileForm())
       return
     }
 
@@ -115,6 +136,11 @@ export function useSajuApp() {
     loadProfile(userId).finally(() => setProfileLoading(false))
     loadReadings()
   }, [userId])
+
+  useEffect(() => {
+    if (!profile) return
+    setSubjectForm((prev) => (prev.name ? prev : profileToForm(profile)))
+  }, [profile])
 
   useEffect(() => {
     if (session || authLoading) return
@@ -145,11 +171,15 @@ export function useSajuApp() {
 
     ;(async () => {
       const text = normalizeResult(pending.result)
+      const form = pending.form
+        ? { ...emptyProfileForm(), ...pending.form }
+        : profileToForm(profile)
       setResult(text)
+      setSubjectForm(form)
       setShowLoginModal(false)
       setActionLoading(true)
       try {
-        const saved = await createReading(text)
+        const saved = await createReading(text, form)
         clearPendingReading()
         if (saved?.id) {
           setSelectedId(saved.id)
@@ -209,6 +239,7 @@ export function useSajuApp() {
       setResult('')
       setReadings([])
       setProfile(null)
+      setSubjectForm(emptyProfileForm())
       pendingHandledRef.current = false
       clearPendingReading()
     } catch (err) {
@@ -240,7 +271,7 @@ export function useSajuApp() {
   async function loadReadings() {
     const { data, error: fetchError } = await supabase
       .from('saju_readings')
-      .select('id, user_id, result, created_at, share_token')
+      .select(READING_COLUMNS)
       .order('created_at', { ascending: false })
 
     setListLoading(false)
@@ -279,17 +310,21 @@ export function useSajuApp() {
     return data
   }
 
-  async function createReading(resultText) {
+  async function createReading(resultText, form) {
     if (!userId) throw new Error('로그인이 필요합니다.')
     if (!profile) throw new Error('프로필을 먼저 등록해 주세요.')
+
+    const message = validateProfileForm(form)
+    if (message) throw new Error(message)
 
     const { data, error: saveError } = await supabase
       .from('saju_readings')
       .insert({
         user_id: userId,
         result: resultText,
+        ...formToReadingSubject(form),
       })
-      .select('id, user_id, result, created_at, share_token')
+      .select(READING_COLUMNS)
       .single()
 
     if (saveError) throw saveError
@@ -303,7 +338,7 @@ export function useSajuApp() {
       .from('saju_readings')
       .update({ result: resultText })
       .eq('id', id)
-      .select('id, user_id, result, created_at, share_token')
+      .select(READING_COLUMNS)
       .single()
 
     if (updateError) throw updateError
@@ -326,7 +361,7 @@ export function useSajuApp() {
 
     trackEvent('share_click', { location: 'result' })
     const url = getShareUrl(reading.share_token)
-    const title = profile?.name ? `${profile.name}님의 사주` : '명운당 결과'
+    const title = reading.name ? `${reading.name}님의 사주` : '명운당 결과'
 
     await shareLink({
       title,
@@ -346,6 +381,16 @@ export function useSajuApp() {
 
   function applyProfileFormChange(field, value) {
     setProfileForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  function applySubjectFormChange(field, value) {
+    setSubjectForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  function handleFillSubjectFromProfile() {
+    if (!profile || isBusy) return
+    setSubjectForm(profileToForm(profile))
+    showToast('내 프로필 정보로 채웠어요.')
   }
 
   async function handleSaveProfile(e, { closeEdit = true } = {}) {
@@ -407,6 +452,7 @@ export function useSajuApp() {
     setShowProfileEdit(false)
     setResult('')
     setError('')
+    if (profile) setSubjectForm(profileToForm(profile))
     clearPendingReading()
     showToast('새 사주 만들기로 이동했어요.')
     requestAnimationFrame(() => {
@@ -484,13 +530,15 @@ export function useSajuApp() {
   }
 
   async function handleReinterpret() {
-    if (!selectedId || isBusy || !profile) return
+    if (!selectedId || isBusy) return
+    const reading = readings.find((item) => item.id === selectedId)
+    if (!reading) return
 
     trackEvent('reading_reinterpret')
     setError('')
     setLoading(true)
     try {
-      const finalText = await askSajuInterpretation(profileAsSajuForm(profile), (text) =>
+      const finalText = await askSajuInterpretation(readingAsSajuForm(reading), (text) =>
         setResult(text),
       )
       setResult(finalText)
@@ -510,23 +558,14 @@ export function useSajuApp() {
     if (isBusy) return
 
     const userType = session && profile ? 'member' : 'guest'
-    let formPayload
-    if (session && profile) {
-      formPayload = profileAsSajuForm(profile)
-    } else {
-      const message = validateProfileForm(profileForm)
-      if (message) {
-        setError(message)
-        return
-      }
-      formPayload = {
-        name: profileForm.name.trim(),
-        birthDate: profileForm.birthDate,
-        birthTime: profileForm.birthTime,
-        gender: profileForm.gender,
-        calendarType: profileForm.calendarType,
-      }
+    const form = userType === 'member' ? subjectForm : profileForm
+    const message = validateProfileForm(form)
+    if (message) {
+      setError(message)
+      return
     }
+
+    const formPayload = formAsSajuForm(form)
 
     trackEvent('saju_submit', { user_type: userType })
     setError('')
@@ -540,12 +579,12 @@ export function useSajuApp() {
       setResult(finalText)
 
       if (session && profile) {
-        const saved = await createReading(finalText)
+        const saved = await createReading(finalText, form)
         if (saved?.id) setSelectedId(saved.id)
       } else {
         writePendingReading({
           result: finalText,
-          form: { ...profileForm, name: profileForm.name.trim() },
+          form: { ...form, name: form.name.trim() },
           savedAt: Date.now(),
         })
         requestAnimationFrame(() => {
@@ -573,6 +612,7 @@ export function useSajuApp() {
     profile,
     profileLoading,
     profileForm,
+    subjectForm,
     showProfileModal,
     showProfileEdit,
     showLoginModal,
@@ -588,6 +628,8 @@ export function useSajuApp() {
     profileError,
     readings,
     selectedId,
+    selectedReading,
+    activeSubject,
     isEditing,
     sidebarOpen,
     setSidebarOpen,
@@ -601,6 +643,8 @@ export function useSajuApp() {
     handleSignOut,
     handleShareReading,
     applyProfileFormChange,
+    applySubjectFormChange,
+    handleFillSubjectFromProfile,
     handleSaveProfile,
     handleOpenProfileEdit,
     handleCancelProfileEdit,
